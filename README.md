@@ -1,6 +1,6 @@
 # pozoledf-sample-app-deployment
 
-[PozoleDF](https://github.com/kuritsu/pozoledf) Sample NodeJS Application Kubernetes deployment configuration.
+[PozoleDF](https://github.com/kuritsu/pozoledf) [Sample App](https://github.com/kuritsu/pozoledf-sample-app) deployment configuration.
 
 ## Repository structure
 
