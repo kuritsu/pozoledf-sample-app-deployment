@@ -46,13 +46,13 @@ When you commit your changes to the release branch, the cookbook will be updated
 Chef Infra server. You can then open a Pull Request to be approved by your team in order to apply the
 updated environment configuration.
 
-When the main branch of this repo triggers, the Jenkins pipeline will perform the following steps:
+When the main branch of this repo changes, the Jenkins pipeline will perform the following steps:
 - Update the Chef Infra Server with all the environment configuration contained in the
   `environments` directory.
 
-Every 10-30 minutes, all Chef Infra clients will request its configuration data from the Infra Server,
+Every 10-30 minutes, all Chef Infra clients will request their configuration from the Infra Server,
 and thus the new configuration will be applied. *We recommend that this cookbook should contain a notification
-step after the `default` recipe is applied. You can use a Slack message, for example, to indicate that
+step after the `default` recipe is applied. You can send a Slack message, for example, to indicate that
 the deployment/update has been performed successfully in the environment.*
 
 ## Specific environment configuration
