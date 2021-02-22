@@ -31,6 +31,6 @@ updated with the new cookbook, thus making it available for installation.
 
 Secrets such as connection strings and passwords must be stored as Kubernetes secrets.
 By default, the `pozoledf-sample-app-chef` cookbook will check if any file exists in the
-`/var/lib/sample-app/k8s` local directory of the K8S API server. All files found will be
+`/var/lib/sample-app/custom` local directory of the K8S API server. All files found will be
 included as resources in the `kustomization.yml` file, before being applied in K8S.
 Thus the scope of the secrets will be kept local to that environment.
