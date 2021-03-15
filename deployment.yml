@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: private-registry.mycompany.com/sample-app
+        image: registry.mycompany.com/pozoledf-sample-app
         resources:
           limits:
             memory: "128Mi"

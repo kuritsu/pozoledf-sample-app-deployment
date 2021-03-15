@@ -4,8 +4,8 @@ kind: Kustomization
 namePrefix: pozoledf-sample-app
 
 images:
-- name: private-registry.mycompany.com/sample-app
-  newName: private-registry.mycompany.com/sample-app
+- name: registry.mycompany.com/pozoledf-sample-app
+  newName: registry.mycompany.com/pozoledf-sample-app
   newTag: v1.0
 
 resources:
