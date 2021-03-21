@@ -31,7 +31,8 @@ pipeline {
       steps {
         sh '''
           #!/bin/bash
-          for i in {1..`cat release.json|jq 'length'`}; do
+          length=`cat release.json|jq 'length'`
+          for i in {1..$length}; do
             key=`cat release.json|jq -r 'keys['$i' - 1]'`
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $value
