@@ -13,6 +13,7 @@ pipeline {
     HAB_AUTH_TOKEN = credentials("hab-token")
     HAB_BLDR_URL = credentials("hab-builder-url")
     HAB_BLDR_CERT_FILE = credentials("hab-builder-certificate")
+    CHEF_LICENSE = "accept"
   }
 
   stages {
