@@ -37,7 +37,7 @@ pipeline {
             echo $key "-" $value
             hab
           done
-        ''', 
+        '''
       }
     }
 
