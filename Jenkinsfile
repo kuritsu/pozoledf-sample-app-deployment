@@ -12,6 +12,7 @@ pipeline {
     HAB_KEY_FILE = credentials("hab-origin-private-key-file")
     HAB_AUTH_TOKEN = credentials("hab-token")
     HAB_BLDR_URL = credentials("hab-builder-url")
+    HAB_BLDR_CERT_FILE = credentials("hab-builder-certificate")
   }
 
   stages {
@@ -20,11 +21,13 @@ pipeline {
         sh '''
           mkdir -p /hab/cache/keys
           cp -u $HAB_KEY_FILE /hab/cache/keys
+          mkdir -p /hab/cache/ssl
+          cp -u $HAB_BLDR_CERT_FILE /hab/cache/ssl
         '''
       }
     }
 
-    stage("publish release") {
+    stage("promote release") {
       when {
         branch "main"
       }
@@ -47,7 +50,7 @@ pipeline {
       }
     }
 
-    stage("publish artifact") {
+    stage("publish release") {
       when {
         expression { env.BRANCH_NAME != null && env.BRANCH_NAME.matches("^v\\d+\\.\\d+.*") }
       }
