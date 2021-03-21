@@ -37,7 +37,10 @@ pipeline {
             key=`cat release.json|jq -r 'keys['$i']'`
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $values
-            hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value $key
+            pkg_release=`hab pkg list ${HAB_ORIGIN}/pozoledf-sample-app/$value|tail -n 1|awk 'BEGIN { FS = "/" } ; { print $4 }'`
+            if [ $? == 0 ]; then
+              hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
+            fi
             i=$((i + 1))
           done
         '''
