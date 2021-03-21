@@ -36,8 +36,8 @@ pipeline {
           while [ $i -lt $length ]; do
             key=`cat release.json|jq -r 'keys['$i']'`
             value=`cat release.json|jq -r '.'$key`
-            echo $key "-" $value
-            hab
+            echo $key "-" $values
+            hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value $key
             i=$((i + 1))
           done
         '''
