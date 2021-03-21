@@ -32,11 +32,13 @@ pipeline {
         sh '''
           #!/bin/bash
           length=`cat release.json|jq 'length'`
-          for i in {1..$length}; do
-            key=`cat release.json|jq -r 'keys['$i' - 1]'`
+          i=0
+          while [ $i < $length ]; do
+            key=`cat release.json|jq -r 'keys['$i']'`
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $value
             hab
+            i=$((i + 1))
           done
         '''
       }
