@@ -42,7 +42,7 @@ pipeline {
 
     stage("publish artifact") {
       when {
-        expr { env.BRANCH_NAME != null && env.BRANCH_NAME.matches("^v\\d+\\.\\d+.*") }
+        expression { env.BRANCH_NAME != null && env.BRANCH_NAME.matches("^v\\d+\\.\\d+.*") }
       }
       steps {
         sh '''
