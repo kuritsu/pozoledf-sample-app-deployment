@@ -53,7 +53,7 @@ pipeline {
       }
       steps {
         sh '''
-          release_ver=`cat release.json|jq -r ".latest"`
+          release_ver=`cat release.json|jq -r ".dev"`
           sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
           hab pkg build pozoledf-sample-app -k $HAB_ORIGIN
           hab pkg upload --force -c dev results/*.hart
