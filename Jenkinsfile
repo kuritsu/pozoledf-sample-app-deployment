@@ -43,13 +43,16 @@ pipeline {
           i=0
           while [ $i -lt $length ]; do
             key=`cat release.json|jq -r 'keys['$i']'`
+            i=$((i + 1))
+            if [ "$key" == "dev" ]; then
+              continue
+            fi
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $values
             pkg_release=`hab pkg list ${HAB_ORIGIN}/pozoledf-sample-app/$value|tail -n 1|awk 'BEGIN { FS = "/" } ; { print $4 }'`
             if [ $? == 0 ]; then
               hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
             fi
-            i=$((i + 1))
           done
         '''
       }
