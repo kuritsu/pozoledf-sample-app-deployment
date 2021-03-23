@@ -10,9 +10,11 @@ pipeline {
     DOCKER_REGISTRY = credentials("docker-registry-fqdn")
     HAB_ORIGIN = credentials("hab-origin")
     HAB_KEY_FILE = credentials("hab-origin-private-key-file")
+    HAB_PUB_FILE = credentials("hab-origin-public-key-file")
     HAB_AUTH_TOKEN = credentials("hab-token")
     HAB_BLDR_URL = credentials("hab-builder-url")
     HAB_BLDR_CERT_FILE = credentials("hab-builder-certificate")
+    HAB_LICENSE = "accept"
   }
 
   stages {
@@ -21,6 +23,7 @@ pipeline {
         sh '''
           mkdir -p /hab/cache/keys
           cp -u $HAB_KEY_FILE /hab/cache/keys
+          cp -u $HAB_PUB_FILE /hab/cache/keys
           mkdir -p /hab/cache/ssl
           cp -u $HAB_BLDR_CERT_FILE /hab/cache/ssl
         '''
@@ -38,13 +41,16 @@ pipeline {
           i=0
           while [ $i -lt $length ]; do
             key=`cat release.json|jq -r 'keys['$i']'`
+            i=$((i + 1))
+            if [ "$key" == "dev" ]; then
+              continue
+            fi
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $values
             pkg_release=`hab pkg list ${HAB_ORIGIN}/pozoledf-sample-app/$value|tail -n 1|awk 'BEGIN { FS = "/" } ; { print $4 }'`
             if [ $? == 0 ]; then
               hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
             fi
-            i=$((i + 1))
           done
         '''
       }
@@ -58,7 +64,10 @@ pipeline {
         sh '''
           release_ver=`cat release.json|jq -r ".dev"`
           sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
-          hab pkg build pozoledf-sample-app -k $HAB_ORIGIN
+          export HAB_BLDR_URL2=$HAB_BLDR_URL
+          unset HAB_BLDR_URL # so we can build successfully
+          hab pkg build . -k $HAB_ORIGIN
+          export HAB_BLDR_URL=$HAB_BLDR_URL2
           hab pkg upload --force -c dev results/*.hart
         '''
       }
