@@ -13,7 +13,7 @@ pipeline {
     HAB_AUTH_TOKEN = credentials("hab-token")
     HAB_BLDR_URL = credentials("hab-builder-url")
     HAB_BLDR_CERT_FILE = credentials("hab-builder-certificate")
-    CHEF_LICENSE = "accept"
+    HAB_LICENSE = "accept"
   }
 
   stages {
@@ -63,7 +63,6 @@ pipeline {
           sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
           export HAB_BLDR_URL2=$HAB_BLDR_URL
           unset HAB_BLDR_URL # so we can build successfully
-          hab license accept
           hab pkg build pozoledf-sample-app -k $HAB_ORIGIN
           export HAB_BLDR_URL=$HAB_BLDR_URL2
           hab pkg upload --force -c dev results/*.hart
