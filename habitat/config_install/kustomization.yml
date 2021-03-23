@@ -6,7 +6,7 @@ namePrefix: pozoledf-sample-app
 images:
 - name: registry.mycompany.com/pozoledf-sample-app
   newName: 089964607376.dkr.ecr.us-west-2.amazonaws.com/pozoledf-sample-app
-  newTag: 1.0.56
+  newTag: 1.0.57
 
 resources:
 - namespace.yml
