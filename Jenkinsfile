@@ -42,14 +42,14 @@ pipeline {
           while [ $i -lt $length ]; do
             key=`cat release.json|jq -r 'keys['$i']'`
             i=$((i + 1))
-            if [ "$key" == "dev" ]; then
+            if [ "$key" = "dev" ]; then
               continue
             fi
             value=`cat release.json|jq -r '.'$key`
-            echo $key "-" $values
+            echo $key "-" $value
             mkdir $key
             hab pkg download ${HAB_ORIGIN}/pozoledf-sample-app/$value -c dev --download-directory $key
-            if [ $? == 0 ]; then
+            if [ $? = 0 ]; then
               pkg_release=`hab pkg info $key/artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'`
               hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
             fi
