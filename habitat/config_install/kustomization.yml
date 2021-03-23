@@ -9,6 +9,6 @@ images:
   newTag: 1.0.56
 
 resources:
-- namespace.yaml
-- deployment.yaml
-- service.yaml
+- namespace.yml
+- deployment.yml
+- service.yml
