@@ -26,8 +26,6 @@ pipeline {
           cp -u $HAB_PUB_FILE /hab/cache/keys
           mkdir -p /hab/cache/ssl
           cp -u $HAB_BLDR_CERT_FILE /hab/cache/ssl
-          mkdir -p /hab/accepted_licenses
-          touch /hab/accepted_licenses/habitat
         '''
       }
     }
