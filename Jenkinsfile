@@ -64,6 +64,7 @@ pipeline {
             fi
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $value
+            rm -rf $key
             mkdir -p $key
             hab pkg download ${HAB_ORIGIN}/pozoledf-sample-app/$value -c dev --download-directory $key
             if [ $? = 0 ]; then
