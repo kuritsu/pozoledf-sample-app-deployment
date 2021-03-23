@@ -47,7 +47,7 @@ pipeline {
             fi
             value=`cat release.json|jq -r '.'$key`
             echo $key "-" $value
-            mkdir $key
+            mkdir -p $key
             hab pkg download ${HAB_ORIGIN}/pozoledf-sample-app/$value -c dev --download-directory $key
             if [ $? = 0 ]; then
               pkg_release=`hab pkg info $key/artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'`
