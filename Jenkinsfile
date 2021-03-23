@@ -30,6 +30,23 @@ pipeline {
       }
     }
 
+     stage("publish release") {
+      when {
+        expression { env.BRANCH_NAME != null && env.BRANCH_NAME.matches("^v\\d+\\.\\d+.*") }
+      }
+      steps {
+        sh '''
+          release_ver=`cat release.json|jq -r ".dev"`
+          sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
+          export HAB_BLDR_URL2=$HAB_BLDR_URL
+          unset HAB_BLDR_URL # so we can build successfully
+          hab pkg build . -k $HAB_ORIGIN
+          export HAB_BLDR_URL=$HAB_BLDR_URL2
+          hab pkg upload --force -c dev results/*.hart
+        '''
+      }
+    }
+
     stage("promote release") {
       when {
         branch "main"
@@ -54,23 +71,6 @@ pipeline {
               hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
             fi
           done
-        '''
-      }
-    }
-
-    stage("publish release") {
-      when {
-        expression { env.BRANCH_NAME != null && env.BRANCH_NAME.matches("^v\\d+\\.\\d+.*") }
-      }
-      steps {
-        sh '''
-          release_ver=`cat release.json|jq -r ".dev"`
-          sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
-          export HAB_BLDR_URL2=$HAB_BLDR_URL
-          unset HAB_BLDR_URL # so we can build successfully
-          hab pkg build . -k $HAB_ORIGIN
-          export HAB_BLDR_URL=$HAB_BLDR_URL2
-          hab pkg upload --force -c dev results/*.hart
         '''
       }
     }
