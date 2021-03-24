@@ -43,7 +43,7 @@ pipeline {
           unset HAB_BLDR_URL # so we can build successfully
           hab pkg build . -k $HAB_ORIGIN
           export HAB_BLDR_URL=$HAB_BLDR_URL2
-          rm -rf artifacts
+          rm -rf artifacts results
           hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$release_ver -c dev --download-directory . && \
             pkg_release=`hab pkg info artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'` && \
             hab pkg delete ${HAB_ORIGIN}/${APP_NAME}/$release_ver/$pkg_release || true
