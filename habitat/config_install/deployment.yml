@@ -1,8 +1,8 @@
 apiVersion: apps/v1
-namespace: ns
 kind: Deployment
 metadata:
   name: deployment
+  namespace: pozoledf
 spec:
   replicas: 3
   selector:
