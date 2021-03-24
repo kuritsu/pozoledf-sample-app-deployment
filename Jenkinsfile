@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    APP_NAME = "pozoledf-sample_app"
+    APP_NAME = "pozoledf-sample-app"
     DOCKER_REGISTRY = credentials("docker-registry-fqdn")
     HAB_ORIGIN = credentials("hab-origin")
     HAB_KEY_FILE = credentials("hab-origin-private-key-file")
@@ -37,14 +37,14 @@ pipeline {
       }
       steps {
         sh '''
+          rm -rf artifacts results
           release_ver=`cat release.json|jq -r ".dev"`
           sed "s|pkg_version=.*|pkg_version=$release_ver|g" -i habitat/plan.sh
           export HAB_BLDR_URL2=$HAB_BLDR_URL
           unset HAB_BLDR_URL # so we can build successfully
           hab pkg build . -k $HAB_ORIGIN
           export HAB_BLDR_URL=$HAB_BLDR_URL2
-          rm -rf artifacts
-          hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$release_ver && \
+          hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$release_ver -c dev --download-directory . && \
             pkg_release=`hab pkg info artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'` && \
             hab pkg delete ${HAB_ORIGIN}/${APP_NAME}/$release_ver/$pkg_release || true
           hab pkg upload --force -c dev results/*.hart
@@ -71,10 +71,10 @@ pipeline {
             echo $key "-" $value
             rm -rf $key
             mkdir -p $key
-            hab pkg download ${HAB_ORIGIN}/pozoledf-sample-app/$value -c dev --download-directory $key
+            hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$value -c dev --download-directory $key
             if [ $? = 0 ]; then
               pkg_release=`hab pkg info $key/artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'`
-              hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
+              hab pkg promote ${HAB_ORIGIN}/${APP_NAME}/$value/$pkg_release $key
             fi
           done
         '''
