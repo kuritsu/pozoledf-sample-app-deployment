@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    APP_NAME = "pozoledf-sample_app"
+    APP_NAME = "pozoledf-sample-app"
     DOCKER_REGISTRY = credentials("docker-registry-fqdn")
     HAB_ORIGIN = credentials("hab-origin")
     HAB_KEY_FILE = credentials("hab-origin-private-key-file")
@@ -71,10 +71,10 @@ pipeline {
             echo $key "-" $value
             rm -rf $key
             mkdir -p $key
-            hab pkg download ${HAB_ORIGIN}/pozoledf-sample-app/$value -c dev --download-directory $key
+            hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$value -c dev --download-directory $key
             if [ $? = 0 ]; then
               pkg_release=`hab pkg info $key/artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'`
-              hab pkg promote ${HAB_ORIGIN}/pozoledf-sample-app/$value/$pkg_release $key
+              hab pkg promote ${HAB_ORIGIN}/${APP_NAME}/$value/$pkg_release $key
             fi
           done
         '''
