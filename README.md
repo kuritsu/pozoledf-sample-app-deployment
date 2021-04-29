@@ -6,60 +6,40 @@
 
 This repository has 3 types of deployment configuration:
 
-- [Chef cookbook](https://docs.chef.io/cookbooks/), in the base directory. Contains the Chef recipes
-  to deploy the manifests of the [Sample App](https://github.com/kuritsu/pozoledf-sample-app) in the Kubernetes controller node.
-- [Kubernetes manifests](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/),
-  under the `files/manifests` directory. Contains all the Kubernetes resources declared in YAML files
-  to be deployed (created/modified) on the Kubernetes cluster. They reference the Docker image of
-  the Sample App application.
-- [Chef environment](https://docs.chef.io/environments/) configuration, under the `environments` directory.
-  Contains subdirectories named after all the environments -staging, production1, production2, etc-
-  in which the app will be deployed. The `environment.json` files specify which cookbook version
-  containing the app manifests will be applied to that environment.
-  **Note that this directory will be the primary source of truth regarding the configuration of
-  the existing environments, thus following the
-  [GitOps](https://www.cloudbees.com/gitops/what-is-gitops) paradigm.**
+- [Chef Habitat Package](https://docs.chef.io/habitat/pkg_build), in the habitat directory. It contains the package configuration and scripts to deploy and monitor the app in Kubernetes (`habitat/hooks` dir). As you may notice, it will use the `kubectl apply -k` command to parse the [kustomize] config and apply the generated k8s resources in the `pozoledf` namespace.
+- [Kubernetes manifests](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/), under the `habitat/config_install` directory. Contains all the Kubernetes resources declared in YAML files to be deployed (created/modified) on the Kubernetes cluster. They reference the Docker image of the Sample App application.
+- Environment release configuration, in the `release.json` file. This indicates which version of the app (and corresponding Habitat package) will be deployed per environment.
+Notice that this file will be used by the Jenkins pipeline to perform the corresponding [package promotions](https://docs.chef.io/habitat/pkg_promote/) to the indicated Habitat channels -each environment corresponds to a channel.
 
 ## Versioning strategy explained
 
 The main branch of this repo contains the **truth, applied** basic configuration.
 
-Note that [pozoledf-sample-app](https://github.com/kuritsu/pozoledf-sample-app)'s Jenkins pipeline
-will check out the main branch of this repo, create a new branch called
-v`majorVersion.minorVersion.patch` after a successful build and push it to GitHub.
+Note that [pozoledf-sample-app](https://github.com/kuritsu/pozoledf-sample-app)'s Jenkins pipeline will check out the main branch of this repo, create a new branch called
+v`majorVersion.minorVersion.patch` after a successful build, will update `habitat/config_install/kustomization.yml` with the full Docker image name and new tag version, and the `dev` environment in the `release.json` file. It will then commit and push it to GitHub.
 
-Once the new branch has been pushed, the Jenkins pipeline of this project triggers and performs
-the following actions:
-- Update the `files/manifests/kustomization.yml` with the full Docker image name and new tag version,
-  named after the branch.
-- Change the `metadata.rb` file, to reflect the new version.
-- Deploy the versioned cookbook to the Chef Infra Server.
+Once the new branch has been pushed, the Jenkins pipeline of this project triggers and performs the following actions:
+- Updates the `plan.sh` file, to reflect the new version. Note that 
+- Deploys the versioned Habitat package to the on-prem [Habitat Builder](https://github.com/habitat-sh/on-prem-builder) service.
 
-The branch will remain open, as it can be seen as a release branch. You can perform some of these
-actions to modify the release:
-- Update the YAML files in the `files/manifests` directory to change the K8S resources.
-- Change the recipes of the cookbook, in case a new set of actions is needed for the deployment.
-- Modify the environment configuration under `environments`, so when the branch gets merged in
-  the main branch the environments are updated accordingly.
+The branch will remain open, as it can be seen as a release branch. You can perform some of these actions to modify the release:
+- Update the YAML files in the `habitat/config_install` directory to change the K8S resources.
+- Change the Habitat package config, in case a new set of actions is needed for the deployment.
+- Modify the `release.json` file, so when the branch gets merged in main the environments are updated accordingly (when the Habitat package gets promoted).
 
-When you commit your changes to the release branch, the cookbook will be updated as well in the
-Chef Infra server. You can then open a Pull Request to be approved by your team in order to apply the
-updated environment configuration.
+When you commit your changes to the release branch, the Habitat package config will be updated and the latest package will be promoted to the `dev` environment/channel. You can then open a Pull Request to be approved by your team in order to apply the updated environment configuration.
 
 When the main branch of this repo changes, the Jenkins pipeline will perform the following steps:
-- Update the Chef Infra Server with all the environment configuration contained in the
-  `environments` directory.
+- Detect what was the latest releases of the app/package versions mentioned in `release.json`.
+- Promote the latest release of the version indicated per environment to the corresponding Chef Habitat channel.
 
-Every 10-30 minutes, all Chef Infra clients will request their configuration from the Infra Server,
-and thus the new configuration will be applied. *We recommend that this cookbook should contain a notification
-step after the `default` recipe is applied. You can send a Slack message, for example, to indicate that
-the deployment/update has been performed successfully in the environment.*
+After promotion, the [Habitat Supervisor](https://docs.chef.io/habitat/sup/) service running in a Kubernetes control plane (you need 1 per environment) will detect the package update, and will perform the steps to deploy the updated k8s manifests in the node.
+
+You can track which app version is deployed in which environment from the [Applications dashboard](https://docs.chef.io/automate/applications_dashboard/) of Chef Automate.
 
 ## Specific environment configuration
 
-Sensitive information such as connection strings and passwords must be stored as Kubernetes secrets.
-For such purpose, you can use the [kustomize syntax](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/secretGeneratorPlugin.md) to get the secrets from the local filesystem.
-See the example below:
+Sensitive information such as connection strings and passwords must be stored as Kubernetes secrets. For such purpose, you can use the [kustomize syntax](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/secretGeneratorPlugin.md) to get the secrets from the local filesystem. See the example below:
 
 ```yaml
 # kustomization.yaml
@@ -74,5 +54,4 @@ secretGenerator:
 
 ...
 ```
-You will need to create the files locally in the Kubernetes controller, but you will be able to
-reference them from your manifests.
+You will need to create the files locally in the Kubernetes controller, but you will be able to reference them from your manifests.
