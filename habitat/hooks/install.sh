@@ -13,6 +13,6 @@ kubectl apply -k . || true
 if [ -f "/home/hab/docker-private.sh" ]; then
   kubectl create secret generic regcred \
       -n pozoledf \
-      --from-file=.dockerconfigjson=~/.docker/config.json \
+      --from-file=.dockerconfigjson=/home/hab/.docker/config.json \
       --type=kubernetes.io/dockerconfigjson || true
 fi
