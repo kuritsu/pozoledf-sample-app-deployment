@@ -44,6 +44,7 @@ pipeline {
           unset HAB_BLDR_URL # so we can build successfully
           hab pkg build . -k $HAB_ORIGIN
           export HAB_BLDR_URL=$HAB_BLDR_URL2
+          export SSL_CERT_FILE=$HAB_BLDR_CERT_FILE
           hab pkg download ${HAB_ORIGIN}/${APP_NAME}/$release_ver -c dev --download-directory . && \
             pkg_release=`hab pkg info artifacts/*.hart|tail -n 1|awk 'BEGIN { FS = " : " } ; { print $2 }'` && \
             hab pkg delete ${HAB_ORIGIN}/${APP_NAME}/$release_ver/$pkg_release || true
@@ -61,6 +62,7 @@ pipeline {
           #!/bin/bash
           length=`cat release.json|jq 'length'`
           i=0
+          export SSL_CERT_FILE=$HAB_BLDR_CERT_FILE
           while [ $i -lt $length ]; do
             key=`cat release.json|jq -r 'keys['$i']'`
             i=$((i + 1))
