@@ -11,15 +11,26 @@ This repository has 3 types of deployment configuration:
 - Environment release configuration, in the `release.json` file. This indicates which version of the app (and corresponding Habitat package) will be deployed per environment.
 Notice that this file will be used by the Jenkins pipeline to perform the corresponding [package promotions](https://docs.chef.io/habitat/pkg_promote/) to the indicated Habitat channels -each environment corresponds to a channel.
 
+## Building
+
+The Jenkinsfile in this repo requires the following secrets to be created in Jenkins:
+
+- `docker-registry-fqdn` (text): Host name of the Docker Registry you'll be using for storing your Docker images. Ex: `myregistry.mycompany.com`.
+- `hab-origin` (text): Name of the company you used when installing the Chef Infra Server/Automate node. Ex: `myorg`.
+- `hab-origin-private-key-file` (file): Habitat origin private key file. Download this file from Habitat Builder: login with your admin credentials at `https://chef-automate.private.com/bldr`, then click on the Origin of your company, then click the KEYS tab. Finally, download the private key you find there.
+- `hab-origin-public-key-file` (file): Habitat origin public key file. Download this file from Habitat Builder, following the procedure described on the previous point, except now you'll download the public key.
+- `hab-token` (text): Prerequisite for getting it is to follow the steps indicated [here](https://github.com/kuritsu/pozoledf-chef-repo/tree/main/roles#habitat-channels). Once you generate the `/var/chef/builder-token`, you will use it as this secret.
+- `hab-builder-url` (text): Use `https://chef-automate.private.com/bldr`, replace with your actual Chef Automate host name and keep the path part.
+- `hab-builder-certificate` (file): This is a certificate file, which you can find at `/opt/chef-server-install/ssl-certificate.crt` on the Chef Automate host.
+
 ## Versioning strategy explained
 
 The main branch of this repo contains the **truth, applied** basic configuration.
 
-Note that [pozoledf-sample-app](https://github.com/kuritsu/pozoledf-sample-app)'s Jenkins pipeline will check out the main branch of this repo, create a new branch called
-v`majorVersion.minorVersion.patch` after a successful build, will update `habitat/config_install/kustomization.yml` with the full Docker image name and new tag version, and the `dev` environment in the `release.json` file. It will then commit and push it to GitHub.
+Note that [pozoledf-sample-app](https://github.com/kuritsu/pozoledf-sample-app)'s Jenkins pipeline will check out the main branch of this repo, create a new branch called v`majorVersion.minorVersion.patch` after a successful build, will update `habitat/config_install/kustomization.yml` with the full Docker image name and new tag version, and the `dev` environment in the `release.json` file. It will then commit and push it to GitHub.
 
 Once the new branch has been pushed, the Jenkins pipeline of this project triggers and performs the following actions:
-- Updates the `plan.sh` file, to reflect the new version. Note that 
+- Updates the `plan.sh` file, to reflect the new version.
 - Deploys the versioned Habitat package to the on-prem [Habitat Builder](https://github.com/habitat-sh/on-prem-builder) service.
 
 The branch will remain open, as it can be seen as a release branch. You can perform some of these actions to modify the release:
