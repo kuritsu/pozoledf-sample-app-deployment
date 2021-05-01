@@ -53,11 +53,11 @@ pkg_shasum="TODO"
 # An array of package dependencies needed at runtime. You can refer to packages
 # at three levels of specificity: `origin/package`, `origin/package/version`, or
 # `origin/package/version/release`.
-# pkg_deps=(core/glibc)
+pkg_deps=()
 
 # Optional.
 # An array of the package dependencies needed only at build time.
-# pkg_build_deps=(core/make core/gcc)
+pkg_build_deps=()
 
 # Optional.
 # An array of paths, relative to the final install of the software, where
