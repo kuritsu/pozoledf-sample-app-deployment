@@ -17,11 +17,11 @@ The Jenkinsfile in this repo requires the following secrets to be created in Jen
 
 - `docker-registry-fqdn` (text): Host name of the Docker Registry you'll be using for storing your Docker images. Ex: `myregistry.mycompany.com`.
 - `hab-origin` (text): Name of the company you used when installing the Chef Infra Server/Automate node. Ex: `myorg`.
-- `hab-origin-private-key-file` (file): Habitat origin private key file. Download this file from Habitat Builder: login with your admin credentials at `https://chef-automate.private.com/bldr`, then click on the Origin of your company, then click the KEYS tab. Finally, download the private key you find there.
-- `hab-origin-public-key-file` (file): Habitat origin public key file. Download this file from Habitat Builder, following the procedure described on the previous point, except now you'll download the public key.
 - `hab-token` (text): Prerequisite for getting it is to follow the steps indicated [here](https://github.com/kuritsu/pozoledf-chef-repo/tree/main/roles#habitat-channels). Once you generate the `/var/chef/builder-token`, you will use it as this secret.
 - `hab-builder-url` (text): Use `https://chef-automate.private.com/bldr`, replace with your actual Chef Automate host name and keep the path part.
 - `hab-builder-certificate` (file): This is a certificate file, which you can find at `/opt/chef-server-install/ssl-certificate.crt` on the Chef Automate host.
+
+**Note:** The PozoleDF install script for the Jenkins node should create most of these secrets.
 
 ## Versioning strategy explained
 
