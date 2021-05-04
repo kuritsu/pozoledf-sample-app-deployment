@@ -5,8 +5,8 @@ namespace: pozoledf
 
 images:
 - name: registry.mycompany.com/pozoledf-sample-app
-  newName: 089964607376.dkr.ecr.us-west-2.amazonaws.com/pozoledf-sample-app
-  newTag: 1.0.9
+  newName: pozoledf.azurecr.io/pozoledf-sample-app
+  newTag: 1.0.3
 
 resources:
 - namespace.yml
