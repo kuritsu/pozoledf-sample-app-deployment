@@ -6,7 +6,7 @@
 
 This repository has 3 types of deployment configuration:
 
-- [Chef Habitat Package](https://docs.chef.io/habitat/pkg_build), in the habitat directory. It contains the package configuration and scripts to deploy and monitor the app in Kubernetes (`habitat/hooks` dir). As you may notice, it will use the `kubectl apply -k` command to parse the [kustomize] config and apply the generated k8s resources in the `pozoledf` namespace.
+- [Chef Habitat Package](https://docs.chef.io/habitat/pkg_build), in the habitat directory. It contains the package configuration and scripts to deploy and monitor the app in Kubernetes (`habitat/hooks` dir). As you may notice, it will use the `kubectl apply -k` command to parse the [kustomize](https://kubernetes-sigs.github.io/kustomize/) config and apply the generated k8s resources in the `pozoledf` namespace.
 - [Kubernetes manifests](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/), under the `habitat/config_install` directory. Contains all the Kubernetes resources declared in YAML files to be deployed (created/modified) on the Kubernetes cluster. They reference the Docker image of the Sample App application.
 - Environment release configuration, in the `release.json` file. This indicates which version of the app (and corresponding Habitat package) will be deployed per environment.
 Notice that this file will be used by the Jenkins pipeline to perform the corresponding [package promotions](https://docs.chef.io/habitat/pkg_promote/) to the indicated Habitat channels -each environment corresponds to a channel.
