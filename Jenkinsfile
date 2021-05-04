@@ -10,8 +10,6 @@ pipeline {
     APP_NAME = "pozoledf-sample-app"
     DOCKER_REGISTRY = credentials("docker-registry-fqdn")
     HAB_ORIGIN = credentials("hab-origin")
-    HAB_KEY_FILE = credentials("hab-origin-private-key-file")
-    HAB_PUB_FILE = credentials("hab-origin-public-key-file")
     HAB_AUTH_TOKEN = credentials("hab-token")
     HAB_BLDR_URL = credentials("hab-builder-url")
     HAB_BLDR_CERT_FILE = credentials("hab-builder-certificate")
@@ -22,11 +20,10 @@ pipeline {
     stage("ensure config") {
       steps {
         sh '''
-          mkdir -p /hab/cache/keys
-          cp -u $HAB_KEY_FILE /hab/cache/keys
-          cp -u $HAB_PUB_FILE /hab/cache/keys
           mkdir -p /hab/cache/ssl
           cp -u $HAB_BLDR_CERT_FILE /hab/cache/ssl
+          hab origin key download -s $HAB_ORIGIN
+          hab origin key download $HAB_ORIGIN
         '''
       }
     }
