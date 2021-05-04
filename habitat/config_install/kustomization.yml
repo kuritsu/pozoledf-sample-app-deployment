@@ -6,7 +6,7 @@ namespace: pozoledf
 images:
 - name: registry.mycompany.com/pozoledf-sample-app
   newName: pozoledf.azurecr.io/pozoledf-sample-app
-  newTag: 1.0.4
+  newTag: 1.0.2
 
 resources:
 - namespace.yml
